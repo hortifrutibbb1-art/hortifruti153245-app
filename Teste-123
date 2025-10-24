@@ -1,0 +1,135 @@
+// --- 1. DADOS DOS PRODUTOS ---
+const produtos = [
+    { id: 1, nome: "Banana Prata (Kg)", preco: 4.50, unidade: "Kg" },
+    { id: 2, nome: "Alface Americana (Un)", preco: 3.00, unidade: "Un" },
+    { id: 3, nome: "Tomate Italiano (Kg)", preco: 7.90, unidade: "Kg" },
+    { id: 4, nome: "Morango (Caixa)", preco: 10.00, unidade: "Cx" }
+];
+
+// Telefone do Hortifruti BBB (Mude para o seu número real com código do país e DDD)
+const TELEFONE_BBB = "5511999999999"; 
+
+let carrinho = JSON.parse(localStorage.getItem('carrinhoBBB')) || [];
+
+// --- 2. FUNÇÕES DE RENDERIZAÇÃO ---
+
+// Exibe a lista de produtos na tela
+function renderizarProdutos() {
+    const lista = document.getElementById('lista-produtos');
+    lista.innerHTML = '';
+    produtos.forEach(produto => {
+        const div = document.createElement('div');
+        div.className = 'produto-card';
+        div.innerHTML = `
+            <h3>${produto.nome}</h3>
+            <p>R$ ${produto.preco.toFixed(2)} / ${produto.unidade}</p>
+            <label for="qtd-${produto.id}">Qtd (${produto.unidade}):</label>
+            <input type="number" id="qtd-${produto.id}" value="1" min="1" style="width: 50px; margin-top: 5px;">
+            <button class="btn-add" onclick="adicionarAoCarrinho(${produto.id})">Adicionar</button>
+        `;
+        lista.appendChild(div);
+    });
+}
+
+// Exibe os itens no carrinho e calcula o total
+function renderizarCarrinho() {
+    const itensCarrinho = document.getElementById('itens-carrinho');
+    const totalCarrinho = document.getElementById('total-carrinho');
+    const carrinhoVazioMsg = document.getElementById('carrinho-vazio');
+    
+    itensCarrinho.innerHTML = '';
+    let total = 0;
+
+    if (carrinho.length === 0) {
+        carrinhoVazioMsg.style.display = 'block';
+    } else {
+        carrinhoVazioMsg.style.display = 'none';
+        carrinho.forEach((item, index) => {
+            const produtoInfo = produtos.find(p => p.id === item.id);
+            const subtotal = produtoInfo.preco * item.quantidade;
+            total += subtotal;
+
+            const div = document.createElement('div');
+            div.className = 'item-carrinho';
+            div.innerHTML = `
+                <span>${item.quantidade} x ${produtoInfo.nome}</span>
+                <span>R$ ${subtotal.toFixed(2)}</span>
+            `;
+            itensCarrinho.appendChild(div);
+        });
+    }
+
+    totalCarrinho.textContent = total.toFixed(2);
+    // Salva o carrinho no LocalStorage sempre que o renderizar
+    localStorage.setItem('carrinhoBBB', JSON.stringify(carrinho));
+}
+
+
+// --- 3. FUNÇÕES DE AÇÃO ---
+
+// Adiciona o produto ao array do carrinho
+function adicionarAoCarrinho(produtoId) {
+    const produtoInfo = produtos.find(p => p.id === produtoId);
+    const inputQtd = document.getElementById(`qtd-${produtoId}`);
+    const quantidade = parseInt(inputQtd.value);
+
+    if (quantidade > 0) {
+        const itemExistente = carrinho.find(item => item.id === produtoId);
+        
+        if (itemExistente) {
+            itemExistente.quantidade += quantidade;
+        } else {
+            carrinho.push({ id: produtoId, quantidade: quantidade });
+        }
+
+        alert(`${quantidade} de ${produtoInfo.nome} adicionado(s) ao carrinho!`);
+        renderizarCarrinho(); // Atualiza a visualização e salva no localStorage
+    } else {
+        alert("Por favor, insira uma quantidade válida.");
+    }
+}
+
+// Monta a mensagem e abre o WhatsApp
+function finalizarPedido() {
+    const nomeCliente = document.getElementById('nome-cliente').value.trim();
+    
+    if (nomeCliente === "") {
+        alert("Por favor, insira seu nome para identificarmos o pedido.");
+        return;
+    }
+    
+    if (carrinho.length === 0) {
+        alert("Seu carrinho está vazio. Adicione produtos para fazer um pedido.");
+        return;
+    }
+
+    let mensagem = `*NOVO PEDIDO - Hortifruti BBB* \n\n*Cliente:* ${nomeCliente}\n\n*Itens do Pedido:*\n`;
+    let total = 0;
+
+    carrinho.forEach(item => {
+        const produtoInfo = produtos.find(p => p.id === item.id);
+        const subtotal = produtoInfo.preco * item.quantidade;
+        total += subtotal;
+        mensagem += `${item.quantidade} ${produtoInfo.unidade} de ${produtoInfo.nome} (R$ ${subtotal.toFixed(2)})\n`;
+    });
+
+    mensagem += `\n*TOTAL DO PEDIDO: R$ ${total.toFixed(2)}*`;
+    mensagem += "\n\n(Aguarde nossa confirmação de entrega e pagamento!)";
+
+    // Codifica a mensagem para URL e monta o link do WhatsApp
+    const urlWhatsApp = `https://wa.me/${TELEFONE_BBB}?text=${encodeURIComponent(mensagem)}`;
+
+    // Abre o WhatsApp
+    window.open(urlWhatsApp, '_blank');
+    
+    // Limpa o carrinho após o envio
+    carrinho = [];
+    localStorage.removeItem('carrinhoBBB');
+    renderizarCarrinho();
+}
+
+// --- 4. INICIALIZAÇÃO ---
+window.onload = function() {
+    renderizarProdutos();
+    renderizarCarrinho(); // Carrega o carrinho salvo no localStorage ao abrir
+};
