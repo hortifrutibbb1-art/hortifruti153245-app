@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hortifruti BBB - Pedidos Online</title>
+    <style>
+        /* Estilos CSS simples para simular a aparência de um app */
+        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        header { background-color: #4CAF50; color: white; padding: 15px; text-align: center; }
+        .produto-lista { display: flex; flex-wrap: wrap; justify-content: space-around; padding: 10px; }
+        .produto-card { background-color: white; border: 1px solid #ddd; border-radius: 8px; margin: 10px; padding: 15px; width: 40%; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+        .produto-card h3 { color: #388E3C; }
+        .produto-card p { margin: 5px 0; }
+        .btn-add { background-color: #FF9800; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+        .carrinho { background-color: #fff; padding: 20px; margin-top: 20px; border-top: 1px solid #ccc; }
+        #itens-carrinho { margin-bottom: 15px; }
+        .item-carrinho { border-bottom: 1px dotted #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .btn-checkout { background-color: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Hortifruti BBB 🥕 App</h1>
+        <p>Seus produtos frescos com um clique!</p>
+    </header>
+
+    <div class="produto-lista" id="lista-produtos">
+        </div>
+
+    <div class="carrinho">
+        <h2>Seu Carrinho</h2>
+        <div id="itens-carrinho">
+            <p id="carrinho-vazio" style="text-align: center;">Carrinho Vazio.</p>
+        </div>
+        <h3>Total: R$ <span id="total-carrinho">0.00</span></h3>
+        
+        <label for="nome-cliente">Seu Nome:</label>
+        <input type="text" id="nome-cliente" placeholder="Para identificarmos seu pedido" style="width: 98%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc;">
+
+        <button class="btn-checkout" onclick="finalizarPedido()">Finalizar Pedido (via WhatsApp)</button>
+    </div>
+
+    <script src="app.js"></script> 
+</body>
+</html>
